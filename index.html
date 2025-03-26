@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tekari AI - Ticket Summarizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    /* Dynamic gradient animation */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(-45deg, #0d47a1, #1976d2, #42a5f5, #e3f2fd);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem;
+      color: #fff;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #ffffff;
+      text-shadow: 0 0 8px #2196f3;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 600px;
+      height: 150px;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      resize: vertical;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(33, 150, 243, 0.4);
+    }
+
+    button {
+      background: #2196f3;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(33, 150, 243, 0.6);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #1e88e5;
+      box-shadow: 0 0 25px rgba(33, 150, 243, 0.8);
+    }
+
+    #summary {
+      width: 100%;
+      max-width: 600px;
+      background-color: rgba(0, 0, 0, 0.25);
+      padding: 1.5rem;
+      margin-top: 2rem;
+      border-radius: 10px;
+      min-height: 100px;
+      box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+      white-space: pre-wrap;
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body>
+  <h1>Tekari AI - Ticket Summarizer</h1>
+  <textarea id="issueInput" placeholder="Paste or describe the IT issue..."></textarea>
+  <button onclick="summarize()">Summarize</button>
+
+  <div id="summary">Waiting for input...</div>
+
+  <script>
+    async function summarize() {
+      const content = document.getElementById("issueInput").value;
+      const summaryDiv = document.getElementById("summary");
+      summaryDiv.innerHTML = "⏳ Generating summary...";
+
+      try {
+        const res = await fetch("https://tekari-backend-deploy.onrender.com/api/summarize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content })
+        });
+
+        const data = await res.json();
+        summaryDiv.innerHTML = data.summary || "No summary received.";
+      } catch (error) {
+        summaryDiv.innerHTML = "⚠️ Error: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
