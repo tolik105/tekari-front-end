@@ -1,101 +1,170 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tekari AI - Ticket Summarizer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Inter&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tekari Copilot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Dynamic gradient animation */
-    body {
+    :root {
+      --gradient-start: #60a5fa;
+      --gradient-end: #ec4899;
+      --background: #ffffff;
+      --input-bg: #f8fafc;
+      --input-border: #cbd5e1;
+      --text-color: #1e293b;
+      --bot-bg: #f1f5f9;
+      --user-bg: #e0f2fe;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
       margin: 0;
       padding: 0;
       font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      background: linear-gradient(-45deg, #0d47a1, #1976d2, #42a5f5, #e3f2fd);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
+      height: 100%;
+      background: var(--background);
+      color: var(--text-color);
+    }
+
+    .chat-container {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 3rem 1rem;
-      color: #fff;
+      height: 100vh;
+      max-width: 960px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+      background: var(--background);
     }
 
-    @keyframes gradientBG {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
+    .chat-header {
+      padding: 2rem 1rem;
+      text-align: center;
+      font-size: 2.25rem;
+      font-weight: 600;
+      background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      margin-bottom: 2rem;
-      color: #ffffff;
-      text-shadow: 0 0 8px #2196f3;
+    .chat-window {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      background: var(--background);
     }
 
-    textarea {
-      width: 100%;
-      max-width: 600px;
-      height: 150px;
-      padding: 1rem;
-      border: none;
-      border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.15);
-      color: #fff;
+    .message {
+      max-width: 75%;
+      padding: 1rem 1.25rem;
+      border-radius: 1rem;
       font-size: 1rem;
-      margin-bottom: 1.5rem;
-      resize: vertical;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 10px rgba(33, 150, 243, 0.4);
-    }
-
-    button {
-      background: #2196f3;
-      color: white;
-      font-weight: bold;
-      border: none;
-      padding: 0.8rem 2rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(33, 150, 243, 0.6);
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      background: #1e88e5;
-      box-shadow: 0 0 25px rgba(33, 150, 243, 0.8);
-    }
-
-    #summary {
-      width: 100%;
-      max-width: 600px;
-      background-color: rgba(0, 0, 0, 0.25);
-      padding: 1.5rem;
-      margin-top: 2rem;
-      border-radius: 10px;
-      min-height: 100px;
-      box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+      line-height: 1.6;
       white-space: pre-wrap;
-      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background-color: var(--user-bg);
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background-color: var(--bot-bg);
+    }
+
+    .input-area {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #e2e8f0;
+      background-color: var(--background);
+      align-items: center;
+    }
+
+    .input-area input[type="text"] {
+      flex: 1;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: 12px;
+      outline: none;
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+    }
+
+    .input-area input::placeholder {
+      color: #94a3b8;
+    }
+
+    .input-area input[type="file"] {
+      display: none;
+    }
+
+    .upload-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      background: white;
+    }
+
+    .loader {
+      text-align: center;
+      font-size: 0.95rem;
+      padding: 0.5rem;
+      color: #64748b;
     }
   </style>
 </head>
 <body>
-  <h1>Tekari AI - Ticket Summarizer</h1>
-  <textarea id="issueInput" placeholder="Paste or describe the IT issue..."></textarea>
-  <button onclick="summarize()">Summarize</button>
-
-  <div id="summary">Waiting for input...</div>
+  <div class="chat-container">
+    <div class="chat-header" id="header">Hello, User</div>
+    <div class="chat-window" id="chatbox">
+      <div class="message bot">How can I help you today?</div>
+    </div>
+    <div class="input-area">
+      <label for="fileInput" class="upload-btn">+</label>
+      <input type="file" id="fileInput" />
+      <input type="text" id="issueInput" placeholder="Ask Tekari Copilot..." onkeydown="handleKey(event)" />
+    </div>
+    <div class="loader" id="loader" style="display: none;">Thinking...</div>
+  </div>
 
   <script>
-    async function summarize() {
-      const content = document.getElementById("issueInput").value;
-      const summaryDiv = document.getElementById("summary");
-      summaryDiv.innerHTML = "⏳ Generating summary...";
+    document.addEventListener("DOMContentLoaded", () => {
+      const name = localStorage.getItem("username") || "User";
+      document.getElementById("header").textContent = `Hello, ${name}`;
+    });
+
+    function appendMessage(text, type) {
+      const msg = document.createElement("div");
+      msg.className = `message ${type}`;
+      msg.textContent = text;
+      const chatbox = document.getElementById("chatbox");
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    async function sendMessage(content) {
+      appendMessage(content, "user");
+      const loader = document.getElementById("loader");
+      loader.style.display = "block";
 
       try {
         const res = await fetch("https://tekari-backend-deploy.onrender.com/api/summarize", {
@@ -105,9 +174,23 @@
         });
 
         const data = await res.json();
-        summaryDiv.innerHTML = data.summary || "No summary received.";
+        loader.style.display = "none";
+        appendMessage(data.summary || "(No summary returned.)", "bot");
       } catch (error) {
-        summaryDiv.innerHTML = "⚠️ Error: " + error.message;
+        loader.style.display = "none";
+        appendMessage("Error: " + error.message, "bot");
+      }
+    }
+
+    function handleKey(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const input = document.getElementById("issueInput");
+        const message = input.value.trim();
+        if (message) {
+          input.value = "";
+          sendMessage(message);
+        }
       }
     }
   </script>
