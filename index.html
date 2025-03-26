@@ -71,6 +71,9 @@
       line-height: 1.6;
       white-space: pre-wrap;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s forwards;
     }
 
     .message.user {
@@ -129,6 +132,13 @@
       padding: 0.5rem;
       color: #64748b;
     }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -147,17 +157,24 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const name = localStorage.getItem("username") || "User";
-      document.getElementById("header").textContent = `Hello, ${name}`;
+      const storedName = localStorage.getItem("username") || prompt("Enter your name:") || "User";
+      localStorage.setItem("username", storedName);
+      document.getElementById("header").textContent = `Hello, ${storedName}`;
+
+      const chatHistory = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+      chatHistory.forEach(({ type, text }) => appendMessage(text, type));
     });
 
     function appendMessage(text, type) {
       const msg = document.createElement("div");
       msg.className = `message ${type}`;
       msg.textContent = text;
-      const chatbox = document.getElementById("chatbox");
-      chatbox.appendChild(msg);
-      chatbox.scrollTop = chatbox.scrollHeight;
+      document.getElementById("chatbox").appendChild(msg);
+      document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
+
+      const history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+      history.push({ type, text });
+      localStorage.setItem("chatHistory", JSON.stringify(history));
     }
 
     async function sendMessage(content) {
@@ -192,7 +209,22 @@
         }
       }
     }
+
+    document.getElementById("fileInput").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const content = reader.result;
+        sendMessage(`Summarize this:
+\n${content}`);
+      };
+
+      reader.readAsText(file);
+    });
   </script>
 </body>
 </html>
+
 
